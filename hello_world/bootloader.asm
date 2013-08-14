@@ -1,9 +1,10 @@
 [bits 16]
 [org 0x7c00]
 
+loop:
 	mov si, HelloString
 	call PrintString
-	jmp $
+	jmp loop
 
 PrintCharacter:
 	mov ah, 0x0e
@@ -24,7 +25,7 @@ next_character:
 exit_function:
 	ret
 
-HelloString db 'Hello World', 0
+HelloString db 'I own your machine', 0
 
 times 510 - ($ - $$) db 0
 dw 0xaa55
