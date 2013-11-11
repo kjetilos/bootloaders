@@ -2,11 +2,11 @@
 [org 0x7c00]
 
 loop:
-	mov si, HelloString
-	call PrintString
+	mov si, my_string
+	call print_string
 	jmp loop
 
-PrintCharacter:
+print_char:
 	mov ah, 0x0e
 	mov bh, 0x00
 	mov bl, 0x07
@@ -14,18 +14,18 @@ PrintCharacter:
 	int 0x10
 	ret
 
-PrintString:
-next_character:
+print_string:
+next_char:
 	mov al, [si]
 	inc si
 	or al, al
 	jz exit_function
-	call PrintCharacter
-	jmp next_character
+	call print_char
+	jmp next_char
 exit_function:
 	ret
 
-HelloString db 'I own your machine', 0
+my_string db 'all work and no play', 0
 
 times 510 - ($ - $$) db 0
 dw 0xaa55
