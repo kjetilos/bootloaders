@@ -3,9 +3,6 @@
 [ORG 0x7C00]    ; The BIOS loads the boot sector into memory location 0x7C00
 
 reset_drive:
-        mov al, 'a'
-        call print_char
-
         mov ah, 0               ; RESET-command
         int 13h                 ; Call interrupt 13h
         or ah, ah               ; Check for error code
@@ -16,7 +13,7 @@ reset_drive:
         mov bx, 0x1000          ; Destination address = 0000:1000
 
         mov ah, 02h             ; READ SECTOR-command
-        mov al, 01h             ; Number of sectors to read = 1
+        mov al, 02h             ; Number of sectors to read = 1
         mov ch, 0               ; Cylinder = 0
         mov cl, 02h             ; Sector = 2
         mov dh, 0               ; Head = 0
@@ -37,20 +34,15 @@ reset_drive:
 
         jmp 08h:clear_pipe      ; Jump to code segment, offset clear_pipe
 
-print_char:
-        mov ah, 0x0e
-        mov bh, 0x00
-        mov bl, 0x07
-
-        int 0x10
-        ret
-
 [BITS 32]                       ; We now need 32-bit instructions
 clear_pipe:
-        mov ax, 10h             ; Save data segment identifyer
+        mov ax, 0x10             ; Save data segment identifyer
         mov ds, ax              ; Move a valid data segment into the data segment register
+        mov es, ax
+        mov fs, ax
+        mov gs, ax
         mov ss, ax              ; Move a valid data segment into the stack segment register
-        mov esp, 090000h        ; Move the stack pointer to 090000h
+        mov esp, 0x90000       ; Move the stack pointer to 090000h
 
         mov byte [0x0B8000], 'P'      ; Move the ASCII-code of 'P' into first video memory
         mov byte [0x0B8001], 1Bh      ; Assign a color code
@@ -65,12 +57,12 @@ gdt_null:               ; Null Segment
         dd 0
 
 gdt_code:               ; Code segment, read/execute, nonconforming
-        dw 0FFFFh
-        dw 0
-        db 0
-        db 10011010b
-        db 11001111b
-        db 0
+        dw 0FFFFh       ; Limit [15:0]
+        dw 0            ; Base  [15:0]
+        db 0            ; Base  [23:16]
+        db 10011010b    ; P DPL S Type
+        db 11001111b    ; G D/B L AVL SeqLimit
+        db 0            ; Base [31:24]
 
 gdt_data:               ; Data segment, read/write, expand down
         dw 0FFFFh

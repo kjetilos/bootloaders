@@ -1,0 +1,17 @@
+http://rwmj.wordpress.com/2011/10/12/tip-debugging-the-early-boot-process-with-qemu-and-gdb/
+
+qemu-system-x86_64 -s -S -m 512 -hda winxp.img
+
+Connect with gdb like this
+
+$ gdb
+(gdb) target remote localhost:1234
+(gdb) set architecture i386
+(gdb) break *0x7c00
+(gdb) cont
+
+
+Use asm and text layout in gdb
+
+ C-x C-a
+ layout asm
